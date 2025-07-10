@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Student Attendance Tracker</title>
+  <style>
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      margin: 0px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2b2d42;
+      margin-bottom: 30px;
+    }
+
+    .student-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 260px;
+      text-align: center;
+      font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+
+    .student-card:hover {
+      transform: scale(1.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .student-card span {
+      font-weight: bold;
+      padding-left: 20px;
+    }
+
+    .student-card button {
+      padding: 5px 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .student-card button:hover {
+      opacity: 0.8;
+    }
+
+    .present-btn {
+      background-color: #20ca67;
+      color: white;
+    }
+
+    .absent-btn {
+      background-color: rgb(240, 74, 74);
+      color: white;
+    }
+
+    .status-section {
+      text-align: center;
+      position: relative;
+      bottom: 10px;
+    }
+
+    #summary {
+      font-size: 20px;
+      margin-top: 30px;
+      color: #2b2d42;
+    }
+
+    #summary span {
+      font-weight: bold;
+    }
+
+    #resetBtn,
+    #classA,
+    #classB {
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #8ecae6;
+      color: #023047;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 10px 20px;
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+    }
+
+    #resetBtn:hover,
+    #classA:hover,
+    #classB:hover {
+      background-color: #0099ff;
+      color: white;
+    }
+
+    #absentroll {
+      margin-top: 20px;
+      font-size: 18px;
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Student Attendance Tracker</h1>
+
+  <div id="studentName" class="card-container"></div>
+
+  <div id="summary">
+    ✅ Present: <span id="presentCount">0</span> |
+    ❌ Absent: <span id="absentCount">0</span> |
+    📋 Total: <span id="totalCount">0</span>
+  </div>
+
+  <button id="classA" onclick="showlistforA()">Class A</button>
+  <button id="classB" onclick="showlistforB()">Class B</button>
+  <button id="resetBtn" onclick="resetAttendance()">🔄 Reset</button>
+  <button id="resetBtn" onclick="takeattendens()">📋 Take Attendance</button>
+
+  <div id="absentroll"></div>
+
+  <script>
+    const studentA = [ "Jiya Kyada", "Shah Dhvani Hitesh", "Saraya Mohit Haresh", "Zalavadiya Heet Siddharth", "Darshil Dobariya", "Nafisa Gandhi", "Vasani Yashvi Niteshbhai", "Delvadiya Manavkumar Kirtibhai", "Ashara Palak Gopalbhai", "Lunagariya Greshi Kamleshbhai",
+      "Nanavati Shrushti Gargesh", "Ranpara Jay Manishbhai", "Disha Mehta", "Thummar Niraj Bhaveshbhai", "Kachhava Nakul Umeshbhai", "Kanabar Urva Darshanbhai", "Nakar Dhruvil Hitesh", "Poshiya Priyanshi Ajaybhai", "Baravalia Dharitri Manharbhai", "Muchhara Kashish Hiteshbhai",
+      "Chauhan Aditya Sureshbhai", "Harsora Sakshi Ajaybhai", "Katrodiya Sahil Rajeshbhai", "Trambadiya Parikshit Parimalbhai", "Padariya Preya Parasbhai", "Gambhava Krushiben Manojbhai", "Jadeja Vishwrajsinh Krushnasinh", "Patel Jiya Sandipbhai", "Pipalava Smit Ashvinbhai", "Gohil Harshrajsinh Jitendrasinh",
+      "Kathiriya Arshi Keshubhai", "Undhad Vishwa Rajesh", "Diya Raiyani", "Chavda Maulik Vinodbhai", "Chavda Priyanka Prabodhbhai", "Chavda Virendrasinh Ashwinbhai", "Galani Krunal Chetanbhai", "Kavar Suchi Vasantbhai", "Odedara Nilesh Parbat", "Vasani Dishita Nikhilkumar",
+      "Vachhani Vaishvi Manojkumar", "Bhadania Ronit Yatinbhai", "Chauhan Jenil Virenbhai", "Virpara Krisha Rajeshbhai", "Chandra Darshit Hiteshbhai", "Detroja Ruchit Arvindbhai", "Kapuriya Hepin Pravinbhai", "Gohel Smit Ashvinbhai", "Patel Kirtan Amitbhai", "Ginoya Deep Kantilal",
+      "Marvaniya Jainish Dharmendrabhai", "Ajudiya Yash Nareshbhai", "Manas Borisagar", "Joshi Soham Kamleshbhai", "Kakadiya Khilan Manishbhai", "Sidhdhapura Dhaval Dharmeshbhai", "Sitapara Aryan Sunilbhai", "Bhatasana Nainshi Pareshbhai", "Malvaniya Viraj Jatinbhai", "Tanisha Pambhar",
+      "Padshala Kuldeep Rajendrakumar", "Bhimani Vishva Manishbhai", "Karan Anushka Pintubhai", "Vyas Kavya Sachin", "Kamani Purna Hareshbhai", "Mori Nandita Renishkumar", "Ratanghayra Pankti Himanshu", "Rupala Nikhil Kashmeeraben", "Jadeja Shivrajsinh Girirajsinh", "Hirva Satani",
+      "Raiyani Jenil Sanjaybhai", "Chandpa Prince Sureshbhai", "Faldu Vrajesh Sanjaybhai", "Khambholiya Manya Parasharbhai", "Prajapati Kaivalya Samir", "Moral Aadit Shaileshbhai", "Shihora Vibhu Chetanbhai", "Kanani Kruti Jayeshbhai", "Karoliya Princekumar Sandipbhai", "Khunt Rutvi Hiteshbhai",
+      "Charadva Abhishek Virenbhai", "Dave Krisha Kalpeshbhai", "Janvi Kalaria", "Rajwani Rohan Malik", "Rana Parthrajsinh Bhupatsinh", "Solanki Ronak Arvindbhai", "Panchal Vedantkumar Niravbhai", "Ambasana Venisha Hitenbhai", "Raichura Smeet Rohitkumar", "Gambhava Mirali Sureshbhai",
+      "Dave Dhruv Viralkumar", "Ghetiya Ritu Pankajbhai", "Radhanpara Saumya Jatinbhai", "Yadav Gaurav Kaushikbhai", "Buddhadev Misri Sanjaybhai", "Joshi Kairav Paren", "Savaliya Dhruvi Bharatbhai", "Radhanpura Jeel Nimish", "Savaliya Priyanshi Sureshbhai", "Zala Bhavyadeepsinh Pruthvirajsinh",
+      "Sinha Milankumar Sujitkumar", "Lakhtaria Kevin Homin", "Moliya Kartavya Bhaveshbhai", "Monpara Nij Hareshbhai", "Divya Thakar", "Mendapara Piyu Amishbhai", "Pandya Karan Tusharbhai", "Raval Meet Mohitkumar", "Virpariya Heer Manishbhai", "Bhanushali Hiral Bhaven",
+      "Kamaliya Akashkumar Rameshbhai", "Popat Honey Nileshbhai", "Badrakiya Meet Bharatbhai", "Kanani Kavit Nareshbhai", "Ambaliya Manan Jayeshbhai", "Hinsu Umang Bharatbhai", "Kakaniya Bhavy Niteshbhai", "Padia Kartik Balkrishna", "Mankada Hasan Shabbirhusain", "Mehta Dhairy Kalpeshbhai",
+      "Mehta Het Lalitkumar", "Kahan Sanghani", "Gotani Himesh Sanjaybhai", "Narola Yash Nileshbhai", "Targata Dharmishtha Arjanbhai", "Bhuva Tirth Shaileshbhai", "Jadeja Yashraj Lakhdhirsinh", "Krisha Pujara", "Varsani Ritul Hirji", "Parmar Dhyey Dharmendra",
+      "Shingala Mansi Rajeshbhai", "Dobariya Jeel Upendrabhai", "Khant Mannkumar Jigneshbhai", "Yadav Neel Hiteshbhai", "Andodariya Yash Maheshbhai", "Hirani Jeelkumar Sanjaybhai", "Mankad Shyamsundar Mitbhai", "Agavan Rohan Farukbhai", "Bhadja Zeel Satishkumar", "Shreya Vijaybhai Bhundia",
+      "Aghara Keyur Hiteshbhai", "Buddhadev Deep Nitinbhai", "Godham Meet Maheshbhai", "Katariya Trisha Ashvinbhai", "Vekariya Jay Bipinbhai", "Rutvi Gautami", "Sankaliya Aryan Ashokbhai", "Ghadiya Yashvi Sanjaybhai", "Ved Chatvani", "Ghorai Swati Sanjib",
+      "Karena Radhika Bharatbhai", "Pandya Kruti Tusharbhai", "Patel Tejkumar Niteshbhai", "Sagpariya Mahee Nitinbhai", "Sherasiya Shyam Sureshbhai", "Liya Hirvita Rajendra", "Ahir Krishna Manishbhai", "Parmar Devanshu Gopalbhai", "Tivari Astha Sureshbhai", "Pal Kana Odedra",
+      "Sorathiya Nabhag Sanjaybhai", "Chauhan Vishal Girishbhai", "Kuchhadiya Vanita Bhima", "Bhimani Naman Chiragbhai", "Diyora Miraj Bhaveshbhai", "Gajera Rakshit Ketanbhai", "Parmar Darpan Jitendra", "Trivedi Manan Vijaykumar", "Dave Maharshi Kirtikumar", "Param Rameshbhai Kotadiya", "Patel Archi Pradipbhai", "Saradhara Yug Vrajbhushanbhai", "Padhariya Ruturajsinh Sureshbhai", "Vegad Jenil Ashokbhai ", "Patani Kismatbanu Shahidbhai ", "Savaliya Jinesh Kantilal", "Tank Darshan Chetanbhai", "Ghodasara Dev Ketanbhai", "Pithadiya Yash Devendrabhai ", "Gohel Jenil Amitkumar"];
+      
+    const studentB = [ "Javiya Nirali Ramjibhai", "Kothadia Jal Hiteshkumar", "Parmar Bhavik Arjanbhai", "Ramani Manav Satishbhai", "Rathod Paras Ravibhai", "Chauhan Smit Hasmukhbhai", "Lunagariya Tirth Jayeshbhai", "Bhatti Jiya Pankajbhai", "Dhaduk Vandan Dipakbhai", "Khorajiya Mahir Mustufa", "Dangar Naimish Hasmukhbhai", "Sureja Vrunda Sumitbhai", "Manek Malay Rishibhai", "Raiyani Vishva Nileshbhai", "Santoki Sakshiben Devendrabhai", "Solanki Naimisha Ganeshbhai", "Taraviya Krutagn Dilipkumar", "Bhatti Hardvi Rajendrabhai", "Dobariya Rutvi Rasikbhai", "Gohel Darshan Kishorbhai", "Siddhpura Vrinda Nileshbhai", "Somaiya Nihal Dipak", "Vala Harsiddhiba Jayvirsinh", "Rankja Khushi Satishbhai", "Shingala Jina Dilipbhai", "Shingala Dharmik Dharmeshbhai", "Parsana Shubham Pareshbhai", "Mendpara Krishaben Hasmukhbhai", "Barevadiya Devarsh Harikrushnabhai", "Gopani Mitsu Bharatbhai", "Jamod Kashika Pravinbhai", "Kalola Hill Kishorbhai", "Pipaliya Meet Bharatbhai", "Sadhu Kuldeep Harshadkumar", "Dhandha Aayushi Sanatbhai", "Jadeja Riddhiba Jayendrasinh", "Kanjariya Radhika Mukeshbhai", "Joshi Vivek Bhaveshbhai", "Dashadiya Yash Kishorbhai", "Kanzariya Krunal Pravinbhai", "Jodhani Dhruvbhai Rajeshkumar", "Shivang Nandani", "Rangani Arpit Dilipbhai", "Ghodasara Yashvi Dhirajlal", "Rakhasiya Nikhil Hasmukhbhai", "Dhamsaniya Princyben Ashokbhai", "Tirth Gamara", "Mahek Patel", "Kasundra Prakruti Sanjaybhai", "Kacha Param Sanjay", "Sorathiya Mann Ashvinbhai", "Vansajaliya Ankit Hemantbhai", "Fultariya om", "Manvar Hemil Rakeshbhai", "Detroja Ujjwal Narendrabhai", "Hinsu Vraj Devjibhai", "Vala Prashantkumar Maheshbhai", "Jadeja Manvendrasinh Jaydeepsinh", "Meghani Rishita Narendrabhai", "Hirani Tulsiben Rohitbhai", "Makwana Shraddha Shaileshbhai", "Bhalala Het Lalitbhai", "Chotaliya Jenish Ashokbhai", "Detroja Sharadkumar Dilipbhai", "Kardani Prince Vipulbhai", "Ughreja Dax Ashokbhai", "Khambhala Tarkesh Vallabhbhai", "Sodha Kashwiniba Lakhansinh", "Vachhani Janvi Avinashbhai", "Dave Hetvi Gopalbhai", "Padia Harsh Jitendrabhai", "Umretiya Kush Bharatbhai", "Khokhar Dhruvi Govind", "Parmar Anirudhdha Govindbhai", "Bhimani Jeel Yogeshbhai", "Patel Neel Sanjaykumar", "Mehta Sneha Ashvinbhai", "Parekh Bhargav Sanjaybhai", "Sakariya Mihir Kishorbhai", "Gondaliya Shrijal Jayeshkumar", "Makvana Rutvik Kalpeshbhai", "Dodiya Riya Darshanbhai", "Limbasiya Deep Pareshbhai", "Parmar Dhruvi Nareshbhai", "Vishva Thesiya", "Dave Dhruv Yogeshkumar", "Lakkad Devisbhai Arvindbhai", "Dalsaniya Yashvi Jayeshkumar", "Bhuva Shivam Ashwinbhai", "Malaviya Mitul Mukeshbhai", "Solanki Aryan Valjibhai", "Vora Rudra Girishbhai", "Solanki Vishal Rameshbhai", "Vyas Jinal Amitbhai", "Savaliya Tirth Navnitbhai", "Vasani Daksh Nikhilkumar", "Kantesaria Pari Romalbhai", "Baraiya Yash Nileshbhai", "Goswami Rudra Nileshgar", "Ladani Mann Snehalbhai", "Parmar Uday Jagdishbhai", "Parsaniya Dhruvkumar Jayendrabhai", "Vagh Dhavalbhai Nareshbhai", "Ghoniya Vrunda Dilipbhai", "Sankhavara Prayag Mansukhlal", "Gohel Kuldeep Kishorbhai", "Bhoraniya Priya Sureshbhai", "Bajadiya Om Bhupatbhai", "Ghardeshiya Man Ashokbhai", "Harkhani Ronak Prafulbhai", "Aryansinh Lalakia", "Mendapara Utpal Shaileshbhai", "Bechra Diya Jayesh", "Mathakiya Navfal Kutbudin", "Kamaliya Manaliben Dineshbhai", "Vaghera Vaidika Hinaben", "Dave Krisha Satyakam", "Markana Nisarg Maheshbhai", "Bagda Sandipkumar Danabhai", "Vora Preet Chetankumar", "Dhamsaniya Dhvani Kishorbhai", "Mungara Meet Vithalbhai", "Hinsu Maitri Dipakbhai", "Mehta Vatsal Yogeshkumar", "Chadamiya Bhavy Babulal", "Bavaliya Tushar Pravinbhai", "Kotadia Richa Cheritkumar", "Chauhan Krutarth Rajubhai", "Sheth Harsh Ketanbhai"];
+
+    const attendanceA = {};
+    const attendanceB = {};
+    let currentClass = 'A';
+
+    const presentRef = document.getElementById("presentCount");
+    const absentRef = document.getElementById("absentCount");
+    const divRef = document.getElementById("studentName");
+
+    studentA.forEach(name => attendanceA[name] = "present");
+    studentB.forEach(name => attendanceB[name] = "present");
+
+    function updateSummaryA() {
+      let present = 0, absent = 0;
+      studentA.forEach(name => attendanceA[name] === "present" ? present++ : absent++);
+      presentRef.textContent = present;
+      absentRef.textContent = absent;
+      document.getElementById("totalCount").textContent = studentA.length;
+    }
+
+    function updateSummaryB() {
+      let present = 0, absent = 0;
+      studentB.forEach(name => attendanceB[name] === "present" ? present++ : absent++);
+      presentRef.textContent = present;
+      absentRef.textContent = absent;
+      document.getElementById("totalCount").textContent = studentB.length;
+    }
+
+    function showlistforA() {
+      currentClass = 'A';
+      let html = "";
+      let roll = 101;
+      studentA.forEach(name => {
+        html += `
+        <div class="student-card">
+          <div class="header-line">${name}<br><span>Roll no - ${roll}</span></div><br>
+          <div class="status-section">
+            <button class="present-btn" onclick="markpresentA('${name}')">Present</button>
+            <button class="absent-btn" onclick="markabsentA('${name}')">Absent</button><br>
+            Status: <span id="${name}">${attendanceA[name]}</span>
+          </div>
+        </div>`;
+        roll++;
+      });
+      divRef.innerHTML = html;
+      updateSummaryA();
+    }
+
+    function showlistforB() {
+      currentClass = 'B';
+      let html = "";
+      let roll = 301;
+      studentB.forEach(name => {
+        html += `
+        <div class="student-card">
+          <div class="header-line">${name}<br><span>Roll no - ${roll}</span></div><br>
+          <div class="status-section">
+            <button class="present-btn" onclick="markpresentB('${name}')">Present</button>
+            <button class="absent-btn" onclick="markabsentB('${name}')">Absent</button><br>
+            Status: <span id="${name}">${attendanceB[name]}</span>
+          </div>
+        </div>`;
+        roll++;
+      });
+      divRef.innerHTML = html;
+      updateSummaryB();
+    }
+
+    function markabsentA(name) {
+      attendanceA[name] = "absent";
+      document.getElementById(name).innerText = "absent";
+      updateSummaryA();
+      takeattendens();
+    }
+
+    function markabsentB(name) {
+      attendanceB[name] = "absent";
+      document.getElementById(name).innerText = "absent";
+      updateSummaryB();
+      takeattendens();
+    }
+
+    function markpresentA(name) {
+      attendanceA[name] = "present";
+      document.getElementById(name).innerText = "present";
+      updateSummaryA();
+      takeattendens();
+
+    }
+
+    function markpresentB(name) {
+      attendanceB[name] = "present";
+      document.getElementById(name).innerText = "present";
+      updateSummaryB();
+      takeattendens();
+
+    }
+
+    function resetAttendance() {
+      if (currentClass == 'A') {
+        studentA.forEach(name => attendanceA[name] = "present");
+        showlistforA();
+      } else {
+        studentB.forEach(name => attendanceB[name] = "present");
+        showlistforB();
+      }
+
+      
+      document.getElementById("absentroll").innerHTML = ""
+    }
+
+    function takeattendens() {
+      const absentList = [];
+      const students = currentClass == 'A' ? studentA : studentB;
+      const attendance = currentClass == 'A' ? attendanceA : attendanceB;
+      const rollStart = currentClass == 'A' ? 101 : 301;
+
+      students.forEach((name, index) => {
+        if (attendance[name] == "absent") {
+          absentList.push(rollStart + index);
+        }
+      });
+
+      document.getElementById("absentroll").innerHTML =
+        "Absent Roll Numbers: " + absentList.join(", ");
+    }
+  </script>
+</body>
+
+</html>
